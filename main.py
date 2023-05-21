@@ -136,3 +136,6 @@ def get_data():
 @app.route("/")
 def teste():
     return "Hello Another World"
+
+if __name__ == '__main__':
+    app.run()
