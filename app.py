@@ -114,25 +114,41 @@ def get_data():
     return json.dumps(list_dict, indent = 4)
 
 # -------------- Valida o acesso da pessoa
-# @app.route("/validateLogin")
-# def get_data():
-#     email = request.args.get('email', '')
-#     password = request.args.get('password', '')
+@app.route("/validateLogin")
+def validate_login():
+    email = request.args.get('email', '')
+    password = request.args.get('password', '')
 
-#     cnx = connect_db()
+    cnx = connect_db()
     
-#     cursor = cnx.cursor(buffered = True)
+    cursor = cnx.cursor(buffered = True)
 
-#     query = ("SELECT id FROM pessoas WHERE email = " + email + " AND senha = " + password)
+    query = ("SELECT * FROM pessoas WHERE email = '" + email + "' AND senha = '" + password + "'")
 
-#     cursor.execute(query)
+    print(query)
+
+    cursor.execute(query)
     
-#     list_tuple = cursor.fetchall()
+    list_tuple = cursor.fetchall()
 
-#     if len(list_tuple) > 0:
-#         return True
+    if len(list_tuple) > 0:
+        list_dict = []
+        for tuple in list_tuple:
+            # Da para fazer assim no dic pq as colunas da tabela n mudam, mas se mudar vai ter q mudar aqui tbm
+            dict = {
+                "id": tuple[0],
+                "nome": tuple[1],
+                "email": tuple[2],
+                "senha": tuple[3],
+                "vendedor": tuple[4],
+                "nome_produto": tuple[5],
+                "quantidade_produto": tuple[6]
+            }
+            list_dict.append(dict)
+        
+        return json.dumps(list_dict, indent = 4)
 
-#     return False
+    return {}
 
 @app.route("/")
 def teste():
