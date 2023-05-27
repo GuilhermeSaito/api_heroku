@@ -113,6 +113,38 @@ def get_data():
     
     return json.dumps(list_dict, indent = 4)
 
+@app.route("/insertDataPessoa")
+def insertDataPessoa():
+    nome = request.args.get('nome', '')
+    email = request.args.get('email', '')
+    password = request.args.get('password', '')
+    vendedor = request.args.get('vendedor', '')
+
+    data_insert = (nome, email, password, vendedor)
+
+    cnx = connect_db()
+    
+    cursor = cnx.cursor(buffered = True)
+
+    query = ("INSERT INTO pessoas (nome, email, senha, vendedor) VALUES (%s, %s, %s, %s)")
+
+    try:
+        cursor.execute(query, data_insert)
+        
+        cnx.commit()
+
+        cnx.close()
+    except mysql.connector.Error as error:
+        return json.dumps({
+            "message: " : "Error in inserting data: ",
+            "error: " : error
+        })
+        
+    
+    return json.dumps({
+        "message: " : "Successfully inserted data"
+    })
+
 # -------------- Valida o acesso da pessoa
 @app.route("/validateLogin")
 def validate_login():
