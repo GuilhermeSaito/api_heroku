@@ -5,6 +5,8 @@ from mysql.connector import errorcode
 import json
 import configparser
 import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 def connect_db():
     config = configparser.ConfigParser()
@@ -53,11 +55,6 @@ def handle_exception(e):
     })
     response.content_type = "application/json"
     return response
-
-# @app.route("/getMinioObject")
-# def get_data():
-#     bucket_download = request.args.get('bucket', 'valorPadraoSeNaoInserirNenhumDadoNaAPI')
-#     object_download = request.args.get('object', '')
 
 # # -------------- Retorna todos os produtos cadastrados na base
 # @app.route("/getDataProdutos")
@@ -181,6 +178,25 @@ def validate_login():
         return json.dumps(list_dict, indent = 4)
 
     return {}
+
+@app.route("/sendEmail")
+def send_email():
+    email = request.args.get('email', '')
+
+    message = Mail(
+    from_email = 'hanbaikicandymachine@gmail.com',
+    to_emails = email,
+    subject = 'Sending with Twilio SendGrid is Fun',
+    html_content = '<strong>and easy to do anywhere, even with Python</strong>')
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+    except Exception as e:
+        return {}
+    
+    return json.dumps({
+        "message: " : "Email sended to " + email
+    })
 
 @app.route("/")
 def teste():
