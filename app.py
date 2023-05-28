@@ -192,7 +192,9 @@ def send_email():
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
     except Exception as e:
-        return {}
+        return json.dumps({
+            "Error message: " : e
+        })
     
     return json.dumps({
         "message: " : "Email sended to " + email
