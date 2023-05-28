@@ -193,7 +193,7 @@ def send_email():
         response = sg.send(message)
     except Exception as e:
         return json.dumps({
-            "Error message: " : e
+            "Error message: " : str(e)
         })
     
     return json.dumps({
