@@ -136,33 +136,36 @@ def update_product():
     data = request.get_json()
 
     if data is None:
-        return jsonify({'error': 'Invalid JSON data'}), 400
+        return jsonify({'error': 'Invalid JSON data'})
     
-    emails = data.get["email_app"]
-    passwords = data.get["password_app"]
-    nomesProduto = data.get["nome_produtos_app"]
-    quantidadesProdutos = data.get["quantidade_produtos_app"]
-    quadrantesProduto = data.get["quadrante_produtos_app"]
+    emails = data.get("email_app")
+    passwords = data.get("password_app")
+    nomesProduto = data.get("nome_produtos_app")
+    quantidadesProdutos = data.get("quantidade_produtos_app")
+    quadrantesProduto = data.get("quadrante_produtos_app")
 
     cnx = connect_db()
     
     cursor = cnx.cursor(buffered = True)
 
     for nome_produto, quantidade_produto, quadrante_produto, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords):
-        query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
+        # query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
+        query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
+        values = (nome_produto, quantidade_produto, quadrante_produto, email, password)
         try:
-            cursor.execute(query)
+            # cursor.execute(query)
+            cursor.execute(query, values)
             
         except mysql.connector.Error as error:
             return json.dumps({
-                "message: " : "Error in inserting data: ",
-                "error: " : str(error)
+                "message": "Error in updating data",
+                "error": str(error)
             })
     cnx.commit()
 
     cnx.close()
     return json.dumps({
-        "message: " : "Successfully updated data"
+        "message": "Successfully updated data"
     })
 
 # EndPoint para fazer a tela do cliente, mostrando o nome do produto, a quantidade total, quantidade selecionada e os botoes de + ou -, o quadrante serve pra falar pro esp qual motor rodar e quantos quadradinhos devem ser mostrados
