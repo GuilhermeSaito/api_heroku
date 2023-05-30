@@ -131,37 +131,36 @@ def can_insert_product():
     return json.dumps(list_dict, indent = 4)
 
 # EndPoint para a tela do Vendedor, para quando ele for adicionar mais produto E para a pagina do cliente, quando apertar o botao de comprar, vai retornar todos os dados iguais menos a quantidade do produto, que vai ser calculado no app e mandado pra ca
-@app.route("/updateProduct")
+@app.route("/updateProduct", methods=['POST'])
 def update_product():
-    email = request.args.get('email', '')
-    password = request.args.get('password', '')
-    nome_produto = request.args.get('nome_produto', '')
-    quantidade_produto = request.args.get('quantidade_produto', 0)
-    quadrante_produto = request.args.get('quadrante_produto', 0)
+    data = request.get_json()
 
-    # Caso nao tenha nenhum produto, nao deve ocupar nenhum quadrante
-    if quantidade_produto == 0:
-        quadrante_produto = 0
+    if data is None:
+        return jsonify({'error': 'Invalid JSON data'}), 400
+    
+    emails = data.get["email_app"]
+    passwords = data.get["password_app"]
+    nomesProduto = data.get["nome_produtos_app"]
+    quantidadesProdutos = data.get["quantidade_produtos_app"]
+    quadrantesProduto = data.get["quadrante_produtos_app"]
 
     cnx = connect_db()
     
     cursor = cnx.cursor(buffered = True)
 
-    query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
-    print(query)
+    for nome_produto, quantidade_produto, quadrante_produto, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords):
+        query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
+        try:
+            cursor.execute(query)
+            
+        except mysql.connector.Error as error:
+            return json.dumps({
+                "message: " : "Error in inserting data: ",
+                "error: " : str(error)
+            })
+    cnx.commit()
 
-    try:
-        cursor.execute(query)
-        
-        cnx.commit()
-
-        cnx.close()
-    except mysql.connector.Error as error:
-        return json.dumps({
-            "message: " : "Error in inserting data: ",
-            "error: " : str(error)
-        })
-    
+    cnx.close()
     return json.dumps({
         "message: " : "Successfully updated data"
     })
