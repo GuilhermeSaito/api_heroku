@@ -128,7 +128,6 @@ def can_insert_product():
 
         list_dict.append(dict)
 
-    # Retorna todos os quadrantes em que estao disponiveis    
     return json.dumps(list_dict, indent = 4)
 
 # EndPoint para a tela do Vendedor, para quando ele for adicionar mais produto E para a pagina do cliente, quando apertar o botao de comprar, vai retornar todos os dados iguais menos a quantidade do produto, que vai ser calculado no app e mandado pra ca
@@ -174,7 +173,7 @@ def get_produtos_quadrante():
     
     cursor = cnx.cursor(buffered = True)
 
-    query = ("SELECT nome, email, nome_produto, quantidade_produto, quadrante_produto FROM pessoas WHERE quadrante_produto <> 0 ORDER BY quadrante_produto ASC")
+    query = ("SELECT nome, email, nome_produto, quantidade_produto, quadrante_produto, senha FROM pessoas WHERE quadrante_produto = 1 OR quadrante_produto = 2 OR quadrante_produto = 3 OR quadrante_produto = 4 ORDER BY quadrante_produto ASC")
 
     cursor.execute(query)
     
@@ -187,7 +186,8 @@ def get_produtos_quadrante():
             "email": tuple[1],
             "nome_produto": tuple[2],
             "quantidade_produto": tuple[3],
-            "quadrante_produto": tuple[4]
+            "quadrante_produto": tuple[4],
+            "password": tuple[5]
         }
         list_dict.append(dict)
     
