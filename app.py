@@ -34,19 +34,19 @@ def connect_db():
 
     return cnx
 
-def get_quadrate_disponivel(data):
-    list_disponivel = []
+# def get_quadrate_disponivel(data):
+#     list_disponivel = []
 
-    if not(1 in data):
-        list_disponivel.append(1)
-    if not(2 in data):
-        list_disponivel.append(2)
-    if not(3 in data):
-        list_disponivel.append(3)
-    if not(4 in data):
-        list_disponivel.append(4)
+#     if not(1 in data):
+#         list_disponivel.append(1)
+#     if not(2 in data):
+#         list_disponivel.append(2)
+#     if not(3 in data):
+#         list_disponivel.append(3)
+#     if not(4 in data):
+#         list_disponivel.append(4)
 
-    return list_disponivel
+#     return list_disponivel
 
 
 app = Flask(__name__)
@@ -110,23 +110,22 @@ def can_insert_product():
     
     cursor = cnx.cursor(buffered = True)
 
-    query = ("SELECT quadrante_produto FROM pessoas WHERE quadrante_produto = 1 OR quadrante_produto = 2 OR quadrante_produto = 3 OR quadrante_produto = 4;")
+    query = ("SELECT quadrante_produto, email, senha FROM pessoas WHERE quadrante_produto = 1 OR quadrante_produto = 2 OR quadrante_produto = 3 OR quadrante_produto = 4 ORDER BY quadrante_produto;")
 
     cursor.execute(query)
     
     list_tuple = cursor.fetchall()
 
-    list_quadrantes_ocupados = []
-    for tuple in list_tuple:
-        list_quadrantes_ocupados.append(tuple[0])
-
-    list_quadrante_disponivel = get_quadrate_disponivel(list_quadrantes_ocupados)
+    print(list_tuple)
 
     list_dict = []
-    for quadrante in list_quadrante_disponivel:
+    for tuple in list_tuple:
         dict = {
-            "quadrante": quadrante
+            "quadrante": tuple[0],
+            "email": tuple[1],
+            "password": tuple[2]
         }
+
         list_dict.append(dict)
 
     # Retorna todos os quadrantes em que estao disponiveis    
