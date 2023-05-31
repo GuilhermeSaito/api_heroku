@@ -279,19 +279,19 @@ def validate_login():
 @app.route("/sendEmail")
 def send_email():
     email = request.args.get('email', '')
+    title = request.args.get('title', '')
+    content = request.args.get('content', '')
 
     message = Mail(
     from_email = 'hanbaikicandymachine@gmail.com',
-    to_emails = email,
-    subject = 'Sending with Twilio SendGrid is Fun',
-    html_content = '<strong>and easy to do anywhere, even with Python</strong>')
+    to_emails = "guilhermetoshiosaito@gmail.com",
+    subject = "Teste",
+    html_content = "Teste2")
     try:
         sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
     except Exception as e:
-        return json.dumps({
-            "Error message: " : str(e)
-        })
+        return {"message: " : str(e)}
     
     return json.dumps({
         "message: " : "Email sended to " + email
