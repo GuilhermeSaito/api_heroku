@@ -148,6 +148,27 @@ def update_product():
     
     cursor = cnx.cursor(buffered = True)
 
+    if len(emails) == 1:
+        for key, value in data.items():
+            query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
+            values = (key, value)
+        try:
+            # cursor.execute(query)
+            cursor.execute(query, values)
+            
+        except mysql.connector.Error as error:
+            return json.dumps({
+                "message": "Error in updating data",
+                "error": str(error)
+            })
+        cnx.commit()
+
+        cnx.close()
+        return json.dumps({
+            "message": "Successfully updated data"
+        })
+
+
     for nome_produto, quantidade_produto, quadrante_produto, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords):
         # query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
         query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
