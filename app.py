@@ -284,14 +284,16 @@ def send_email():
 
     message = Mail(
     from_email = 'hanbaikicandymachine@gmail.com',
-    to_emails = "guilhermetoshiosaito@gmail.com",
-    subject = "Teste",
-    html_content = "Teste2")
+    to_emails = email,
+    subject = title,
+    html_content = content)
     try:
         sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
     except Exception as e:
-        return {"message: " : str(e)}
+        return json.dumps({
+            "Error message: " : str(e)
+        })
     
     return json.dumps({
         "message: " : "Email sended to " + email
