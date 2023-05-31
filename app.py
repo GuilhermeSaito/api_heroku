@@ -53,7 +53,6 @@ app = Flask(__name__)
 
 @app.errorhandler(400)
 def bad_request(e):
-    print(e)
     return jsonify(error=str(e)), 400
 
 #transforma todos os erros padrões de html para json
@@ -83,8 +82,6 @@ def get_data():
     cursor.execute(query)
     
     list_tuple = cursor.fetchall()
-
-    print(list_tuple)
 
     list_dict = []
     for tuple in list_tuple:
@@ -116,8 +113,6 @@ def can_insert_product():
     
     list_tuple = cursor.fetchall()
 
-    print(list_tuple)
-
     list_dict = []
     for tuple in list_tuple:
         dict = {
@@ -148,10 +143,9 @@ def update_product():
     
     cursor = cnx.cursor(buffered = True)
 
-    if len(emails) == 1:
-        for key, value in data.items():
-            query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
-            values = (key, value)
+    if type(emails) == str:
+        query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
+        values = (nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords)
         try:
             # cursor.execute(query)
             cursor.execute(query, values)
@@ -167,27 +161,26 @@ def update_product():
         return json.dumps({
             "message": "Successfully updated data"
         })
+    else:
+        for nome_produto, quantidade_produto, quadrante_produto, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords):
+            # query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
+            query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
+            values = (nome_produto, quantidade_produto, quadrante_produto, email, password)
+            try:
+                # cursor.execute(query)
+                cursor.execute(query, values)
+                
+            except mysql.connector.Error as error:
+                return json.dumps({
+                    "message": "Error in updating data",
+                    "error": str(error)
+                })
+        cnx.commit()
 
-
-    for nome_produto, quantidade_produto, quadrante_produto, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords):
-        # query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
-        query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
-        values = (nome_produto, quantidade_produto, quadrante_produto, email, password)
-        try:
-            # cursor.execute(query)
-            cursor.execute(query, values)
-            
-        except mysql.connector.Error as error:
-            return json.dumps({
-                "message": "Error in updating data",
-                "error": str(error)
-            })
-    cnx.commit()
-
-    cnx.close()
-    return json.dumps({
-        "message": "Successfully updated data"
-    })
+        cnx.close()
+        return json.dumps({
+            "message": "Successfully updated data"
+        })
 
 # EndPoint para fazer a tela do cliente, mostrando o nome do produto, a quantidade total, quantidade selecionada e os botoes de + ou -, o quadrante serve pra falar pro esp qual motor rodar e quantos quadradinhos devem ser mostrados
 @app.route("/getProdutosQuadrante")
