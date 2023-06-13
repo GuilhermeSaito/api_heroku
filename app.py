@@ -94,7 +94,10 @@ def get_data():
             "vendedor": tuple[4],
             "nome_produto": tuple[5],
             "quantidade_produto": tuple[6],
-            "quadrante": tuple[7]
+            "quadrante": tuple[7],
+            "valor_produto": tuple[8],
+            "chave_pix": tuple[9],
+            "telefone": tuple[10]
         }
         list_dict.append(dict)
     
@@ -138,16 +141,16 @@ def update_product():
     nomesProduto = data.get("nome_produtos_app")
     quantidadesProdutos = data.get("quantidade_produtos_app")
     quadrantesProduto = data.get("quadrante_produtos_app")
+    valorProduto = data.get("valorProduto")
 
     cnx = connect_db()
     
     cursor = cnx.cursor(buffered = True)
 
     if type(emails) == str:
-        query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
-        values = (nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords)
+        query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s, valor_produto = %s WHERE email = %s AND senha = %s"
+        values = (nomesProduto, quantidadesProdutos, quadrantesProduto, valorProduto, emails, passwords)
         try:
-            # cursor.execute(query)
             cursor.execute(query, values)
             
         except mysql.connector.Error as error:
@@ -162,10 +165,10 @@ def update_product():
             "message": "Successfully updated data"
         })
     else:
-        for nome_produto, quantidade_produto, quadrante_produto, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, emails, passwords):
+        for nome_produto, quantidade_produto, quadrante_produto, valorProdutos, email, password in zip(nomesProduto, quantidadesProdutos, quadrantesProduto, valorProduto, emails, passwords):
             # query = ("UPDATE pessoas SET nome_produto = '" + nome_produto + "', quantidade_produto = " + str(quantidade_produto) + ", quadrante_produto = " + str(quadrante_produto) + " WHERE email = '" + email + "' AND senha = '" + password + "';")
-            query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s WHERE email = %s AND senha = %s"
-            values = (nome_produto, quantidade_produto, quadrante_produto, email, password)
+            query = "UPDATE pessoas SET nome_produto = %s, quantidade_produto = %s, quadrante_produto = %s, valor_produto = %s WHERE email = %s AND senha = %s"
+            values = (nome_produto, quantidade_produto, quadrante_produto, valorProdutos, email, password)
             try:
                 # cursor.execute(query)
                 cursor.execute(query, values)
@@ -189,7 +192,7 @@ def get_produtos_quadrante():
     
     cursor = cnx.cursor(buffered = True)
 
-    query = ("SELECT nome, email, nome_produto, quantidade_produto, quadrante_produto, senha FROM pessoas WHERE quadrante_produto = 1 OR quadrante_produto = 2 OR quadrante_produto = 3 OR quadrante_produto = 4 ORDER BY quadrante_produto ASC")
+    query = ("SELECT nome, email, nome_produto, quantidade_produto, quadrante_produto, senha, valor_produto, chave_pix, telefone FROM pessoas WHERE quadrante_produto = 1 OR quadrante_produto = 2 OR quadrante_produto = 3 OR quadrante_produto = 4 ORDER BY quadrante_produto ASC")
 
     cursor.execute(query)
     
@@ -203,7 +206,10 @@ def get_produtos_quadrante():
             "nome_produto": tuple[2],
             "quantidade_produto": tuple[3],
             "quadrante_produto": tuple[4],
-            "password": tuple[5]
+            "password": tuple[5],
+            "valor_produto": tuple[6],
+            "chave_pix": tuple[7],
+            "telefone": tuple[8]
         }
         list_dict.append(dict)
     
@@ -215,14 +221,16 @@ def insertDataPessoa():
     email = request.args.get('email', '')
     password = request.args.get('password', '')
     vendedor = request.args.get('vendedor', '')
+    chave_pix = request.args.get('chave_pix', '')
+    telefone = request.args.get('telefone', '')
 
-    data_insert = (nome, email, password, vendedor)
+    data_insert = (nome, email, password, vendedor, chave_pix, telefone)
 
     cnx = connect_db()
     
     cursor = cnx.cursor(buffered = True)
 
-    query = ("INSERT INTO pessoas (nome, email, senha, vendedor) VALUES (%s, %s, %s, %s)")
+    query = ("INSERT INTO pessoas (nome, email, senha, vendedor, chave_pix, telefone) VALUES (%s, %s, %s, %s, %s, %s)")
 
     try:
         cursor.execute(query, data_insert)
@@ -251,7 +259,7 @@ def validate_login():
     
     cursor = cnx.cursor(buffered = True)
 
-    query = ("SELECT * FROM pessoas WHERE email = '" + email + "' AND senha = '" + password + "'")
+    query = ("SELECT id_pessoas, nome, email, senha, vendedor, nome_produto, quantidade_produto, quadrante_produto, valor_produto, chave_pix, telefone FROM pessoas WHERE email = '" + email + "' AND senha = '" + password + "'")
 
     cursor.execute(query)
     
@@ -260,7 +268,6 @@ def validate_login():
     if len(list_tuple) > 0:
         list_dict = []
         for tuple in list_tuple:
-            # Da para fazer assim no dic pq as colunas da tabela n mudam, mas se mudar vai ter q mudar aqui tbm
             dict = {
                 "id": tuple[0],
                 "nome": tuple[1],
@@ -268,7 +275,11 @@ def validate_login():
                 "senha": tuple[3],
                 "vendedor": tuple[4],
                 "nome_produto": tuple[5],
-                "quantidade_produto": tuple[6]
+                "quantidade_produto": tuple[6],
+                "quadrante": tuple[7],
+                "valor_produto": tuple[8],
+                "chave_pix": tuple[9],
+                "telefone": tuple[10]
             }
             list_dict.append(dict)
         
